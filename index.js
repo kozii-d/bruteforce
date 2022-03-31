@@ -8,7 +8,6 @@ class Queue {
         this.count = concurrentCount;
     }
 
-
     add() {
         return ((this.running.length < this.count) && this.todo.length);
     }
@@ -16,7 +15,8 @@ class Queue {
     run() {
         while (this.add()) {
             const promise = this.todo.shift();
-            promise.then(() => {
+            promise.then((res) => {
+                if (res) console.log(res);
                 this.complete.push(this.running.shift());
                 this.run();
             });
@@ -26,23 +26,22 @@ class Queue {
 }
 
 
-
-
-
 const allowedChars = ['a', 'b', 'c', 'd'];
+
+function randomTime(min, max) {
+    return (min + Math.random() * (max - min)).toFixed(2);
+}
 
 
 async function login(password) {
-    function randomTime(min, max) {
-        return (min + Math.random() * (max - min)).toFixed(2);
-    }
 
     // return password === "abc";
 
     return new Promise(resolve => {
         setTimeout(() => {
-            resolve(password === "abc");
-        }, randomTime(0.1,1));
+            resolve(password === "abadcd");
+            console.log(password)
+        }, randomTime(100,1000));
     });
 }
 
@@ -83,8 +82,10 @@ function* brute(maxLength = 6) {
         let passwordArray = createPasswordArray(passwordLength);
 
         do {
-            yield arrayOfNumToString(passwordArray);
-            // let password = arrayOfNumToString(passwordArray);
+            // yield arrayOfNumToString(passwordArray);
+            let password = arrayOfNumToString(passwordArray);
+
+            yield login(password)
             // if (login(password)) return `Password is: '${password}'`;
             // passwords.push(password);
 
@@ -96,19 +97,26 @@ function* brute(maxLength = 6) {
     // return null;
 }
 
+const iterator = brute();
+
+function createTasks(generator) {
+
+    let promArr = [];
+
+    for (let password of generator) {
+        promArr.push(password);
+    }
+
+    return promArr;
+}
+
+// console.log(createTasks(iterator));
 
 console.time();
-// console.log(brute(3));
-const iterator = brute(3);
-console.log(iterator);
 
-const taskQueue = new Queue(iterator);
-taskQueue.run();
-console.log(taskQueue.complete);
 
-// for (let password of iterator) {
-//     taskQueue.run();
-// }
+const queue = new Queue(createTasks(iterator));
+queue.run();
+// console.log(queue.running);
 
 console.timeEnd();
-
