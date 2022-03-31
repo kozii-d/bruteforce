@@ -32,14 +32,18 @@ class Queue {
 const allowedChars = ['a', 'b', 'c', 'd'];
 
 
-function login(password) {
+async function login(password) {
     function randomTime(min, max) {
         return (min + Math.random() * (max - min)).toFixed(2);
     }
 
-    // setTimeout(() => password === "abc",randomTime(0.1, 1));
+    // return password === "abc";
 
-    return password === "abc";
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(password === "abc");
+        }, randomTime(0.1,1));
+    });
 }
 
 
@@ -95,15 +99,16 @@ function* brute(maxLength = 6) {
 
 console.time();
 // console.log(brute(3));
-const iterator = brute();
+const iterator = brute(3);
 console.log(iterator);
 
-const taskQueue = new Queue([]);
+const taskQueue = new Queue(iterator);
 taskQueue.run();
+console.log(taskQueue.complete);
 
-for (let password of iterator) {
-    taskQueue.run();
-}
+// for (let password of iterator) {
+//     taskQueue.run();
+// }
 
 console.timeEnd();
 
