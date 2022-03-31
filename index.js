@@ -26,7 +26,7 @@ class Queue {
 }
 
 
-const allowedChars = ['a', 'b', 'c', 'd'];
+    const allowedChars = ['a', 'b', 'c', 'd'];
 
 function randomTime(min, max) {
     return (min + Math.random() * (max - min)).toFixed(2);
@@ -35,13 +35,19 @@ function randomTime(min, max) {
 
 async function login(password) {
 
-    // return password === "abc";
+    return password === "abc";
+    //
+    // return new Promise(resolve => {
+    //     setTimeout(() => {
+    //         resolve(password === "abadcd");
+    //         // console.log(password)
+    //     }, randomTime(100,1000));
+    // });
+}
 
+async function payload(password){
     return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(password === "abadcd");
-            console.log(password)
-        }, randomTime(100,1000));
+        setTimeout(login(password), randomTime(100,1000));
     });
 }
 
@@ -82,10 +88,10 @@ function* brute(maxLength = 6) {
         let passwordArray = createPasswordArray(passwordLength);
 
         do {
-            // yield arrayOfNumToString(passwordArray);
-            let password = arrayOfNumToString(passwordArray);
+            yield arrayOfNumToString(passwordArray);
+            // let password = arrayOfNumToString(passwordArray);
 
-            yield login(password)
+            // yield login(password)
             // if (login(password)) return `Password is: '${password}'`;
             // passwords.push(password);
 
@@ -112,11 +118,13 @@ function createTasks(generator) {
 
 // console.log(createTasks(iterator));
 
-console.time();
-
 
 const queue = new Queue(createTasks(iterator));
 queue.run();
+
+console.time();
+
+
 // console.log(queue.running);
 
 console.timeEnd();
