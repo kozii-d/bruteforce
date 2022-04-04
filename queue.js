@@ -1,12 +1,14 @@
 'use strict';
 class Queue {
-    constructor(concurrentCount = 5) {
+    constructor(concurrentCount = 10) {
         this.tasks = [];
-        this.running = [];
         this.count = concurrentCount;
+        this.queueSize = 0;
+        this.nextStep;
     }
 
-    // TODO: добавить в конструктор булевое свойсьво и менять его каждый раз при проверки промиса
+    // TODO: добавить проверку, чтобы execute не включался, когда в tasks ничего нет
+    // TODO: сделать рабочим метод onFulfilled
 
     add(task) {
         this.tasks.push(task);
@@ -19,25 +21,31 @@ class Queue {
 
     execute() {
         const cb = this.tasks.shift();
+
         const promise = cb();
+        if (promise === undefined) {
+            return;
+        }
+        this.queueSize++;
         promise.then(res => {
             console.log(res);
-            this.running.shift();
-            this.onFulfilled(res);
+            this.queueSize--;
+            if (res.valid) {
+                console.log(`Password is '${res.password}'`);
+                this.tasks = [];
+                this.queueSize = 0;
+            }
             this.execute();
+            this.nextStep();
         });
-        this.running.push(promise);
     }
 
     isCanExecute() {
-        return this.running.length < this.count;
+        return this.queueSize < this.count;
     }
 
-    onFulfilled(res) {
-        if (!(this.running.length < this.count)) return;
-        if (res) return;
-
-        this.add(() => iterator.next().value);
+    onFulfilled(callback) {
+        this.nextStep = callback;
     }
 
 }
@@ -51,8 +59,14 @@ function randomTime(min, max) {
 
 
 function login(password) {
+    const valid = password === 'ab';
 
-    return password === "a";
+    return {
+        password,
+        valid
+    };
+
+    // return password === "ab";
 }
 
 async function payload(password){
@@ -99,11 +113,8 @@ function* brute(maxLength = 6) {
         let passwordArray = createPasswordArray(passwordLength);
 
         do {
-            // yield arrayOfNumToString(passwordArray);
             let password = arrayOfNumToString(passwordArray);
-
             yield payload(password);
-
             passwordArray = getNextPasswordArray(passwordArray);
         } while (passwordArray);
 
@@ -113,7 +124,7 @@ function* brute(maxLength = 6) {
 console.time();
 
 
-const iterator = brute(2);
+const iterator = brute(3);
 
 const q = new Queue();
 // q.add(() => iterator.next().value);
@@ -122,5 +133,8 @@ for (let i = 0; i < 20; i++) {
     q.add(() => iterator.next().value);
 }
 
+q.onFulfilled((result, password) => {
+    q.add(() => iterator.next().value);
+});
 
 console.timeEnd();
