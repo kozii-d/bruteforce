@@ -42,21 +42,21 @@ let passwordLength = 1;
 let passwordArray = createPasswordArray(passwordLength);
 
 
-function test () {
-    if (password.length > maxLength) return null;
+    function inner () {
+        if (password.length > maxLength) return null;
 
-    if (!passwordArray) {
-        passwordLength++;
-        passwordArray = createPasswordArray(passwordLength);
+        if (!passwordArray) {
+            passwordLength++;
+            passwordArray = createPasswordArray(passwordLength);
+        }
+
+        password = arrayOfNumToString(passwordArray);
+
+        if (login(password)) return
+        passwordArray = getNextPasswordArray(passwordArray);
+        inner();
     }
-
-    password = arrayOfNumToString(passwordArray);
-
-    if (login(password)) return
-    passwordArray = getNextPasswordArray(passwordArray);
-    test();
-}
-test();
+    inner();
 
 return `Password is: '${password}'`;
 
