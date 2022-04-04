@@ -9,7 +9,7 @@ class Queue {
     // TODO: добавить в конструктор булевое свойсьво и менять его каждый раз при проверки промиса
 
     add(task) {
-        this.tasks.push(() => task);
+        this.tasks.push(task);
 
         if (!this.isCanExecute()) return;
 
@@ -119,7 +119,7 @@ const q = new Queue();
 // q.add(() => iterator.next().value);
 
 for (let i = 0; i < 20; i++) {
-    q.add(iterator.next().value);
+    q.add(() => iterator.next().value);
 }
 
 
