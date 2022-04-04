@@ -19,23 +19,23 @@ class Queue {
     }
 
     execute() {
+        // if (!this.tasks.length) {
+        //     return;
+        // }
         const cb = this.tasks.shift();
-
         const promise = cb();
-        if (promise === undefined) {
-            return;
-        }
         this.queueSize++;
-        promise.then(res => {
-            console.log(res);
+        promise.then(result => {
+            // console.log(res);
             this.queueSize--;
-            if (res.valid) {
-                console.log(`Password is '${res.password}'`);
-                this.tasks = [];
-                this.queueSize = 0;
-            }
+            // if (res.valid) {
+            //     console.log(`Password is '${res.password}'`);
+            //     this.tasks = [];
+            //     this.queueSize = 0;
+            //     // return;
+            // }
+            this.nextStep(result);
             this.execute();
-            this.nextStep();
         });
     }
 
@@ -128,11 +128,18 @@ const iterator = brute(3);
 const q = new Queue();
 // q.add(() => iterator.next().value);
 
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i <= q.count; i++) {
     q.add(() => iterator.next().value);
 }
 
-q.onFulfilled((result, password) => {
+q.onFulfilled((result) => {
+    console.log(result)
+    if (result.valid) {
+        console.log(`Password is '${result.password}'`);
+        this.tasks = [];
+        this.queueSize = 0;
+        return;
+    }
     q.add(() => iterator.next().value);
 });
 

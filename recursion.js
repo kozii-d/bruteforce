@@ -6,63 +6,32 @@ function login(password) {
     return password === "abc";
 }
 
-function arrayOfNumToString(passwordArray) {
-    let password = '';
-    for (let i = 0; i < passwordArray.length; i++) {
-        password += allowedChars[passwordArray[i]];
-    }
-    return password;
-    // return passwordArray.map(number => charsArray[number]).join('');
-}
-
-function createPasswordArray(arrayLength) {
-    const exeptedPasswordArray = [];
-
-    for (let i = 0; i < arrayLength; i++) {
-        exeptedPasswordArray.push(0);
+function arrayIteration(k, allowedChars, login, password = '') {
+    if (k === 0) {
+        return login(password) ? password : null;
     }
 
-    return exeptedPasswordArray;
-}
-
-function getNextPasswordArray(passwordArray) {
-    for (let i = passwordArray.length - 1; i >= 0; i--) {
-        if (passwordArray[i] < allowedChars.length - 1) {
-            passwordArray[i]++;
-            return passwordArray;
+    for (let i = 0; i < allowedChars.length; i++) {
+        let newPassword = password + allowedChars[i];
+        let result = arrayIteration(k - 1, allowedChars, login, newPassword);
+        if (result) {
+            return result;
         }
-        passwordArray[i] = 0;
     }
     return null;
 }
 
 function brute(maxLength = 5) {
-let password = '';
-let passwordLength = 1;
-let passwordArray = createPasswordArray(passwordLength);
 
-
-    function inner () {
-        if (password.length > maxLength) return null;
-
-        if (!passwordArray) {
-            passwordLength++;
-            passwordArray = createPasswordArray(passwordLength);
+    for (let i = 1; i <= maxLength; i++) {
+        let result = arrayIteration(i, allowedChars, login);
+        if (result) {
+            return `Password is: '${result}'`;
         }
-
-        password = arrayOfNumToString(passwordArray);
-
-        if (login(password)) return
-        passwordArray = getNextPasswordArray(passwordArray);
-        inner();
     }
-    inner();
 
-return `Password is: '${password}'`;
-
+    return null;
 }
-
-
 console.time();
 console.log(brute());
 console.timeEnd();
