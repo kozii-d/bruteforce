@@ -42,11 +42,6 @@ class Queue {
 
 }
 
-const iterator = brute(2);
-
-const q = new Queue();
-q.add(() => iterator.next().value);
-
 
 const allowedChars = ['a', 'b', 'c', 'd'];
 
@@ -116,6 +111,16 @@ function* brute(maxLength = 6) {
 
 }
 console.time();
+
+
+const iterator = brute(2);
+
+const q = new Queue();
+// q.add(() => iterator.next().value);
+
+for (let i = 0; i < 20; i++) {
+    q.add(() => iterator.next().value);
+}
 
 
 console.timeEnd();
