@@ -1,6 +1,6 @@
 'use strict';
 class Queue {
-    constructor(concurrentCount = 10) {
+    constructor(concurrentCount = 5) {
         this.tasks = [];
         this.running = [];
         this.count = concurrentCount;
@@ -30,7 +30,7 @@ class Queue {
     }
 
     isCanExecute() {
-        return this.tasks.length < this.count;
+        return this.running.length < this.count;
     }
 
     onFulfilled(res) {
