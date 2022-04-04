@@ -8,7 +8,6 @@ class Queue {
     }
 
     // TODO: добавить проверку, чтобы execute не включался, когда в tasks ничего нет
-    // TODO: сделать рабочим метод onFulfilled
 
     add(task) {
         this.tasks.push(task);
@@ -59,7 +58,7 @@ function randomTime(min, max) {
 
 
 function login(password) {
-    const valid = password === 'ab';
+    const valid = password === 'abc';
 
     return {
         password,
