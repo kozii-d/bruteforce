@@ -19,24 +19,24 @@ class Queue {
     }
 
     execute() {
-        // if (!this.tasks.length) {
-        //     return;
-        // }
+        if (!this.tasks.length) {
+            return;
+        }
         const cb = this.tasks.shift();
         const promise = cb();
-        this.queueSize++;
-        promise.then(result => {
-            // console.log(res);
-            this.queueSize--;
-            // if (res.valid) {
-            //     console.log(`Password is '${res.password}'`);
-            //     this.tasks = [];
-            //     this.queueSize = 0;
-            //     // return;
-            // }
-            this.nextStep(result);
+
+        if (promise instanceof Promise) {
+            this.queueSize++;
+            promise.then(result => {
+                this.queueSize--;
+                this.nextStep(result);
+                this.execute();
+            });
+        } else {
             this.execute();
-        });
+        }
+
+
     }
 
     isCanExecute() {
@@ -132,15 +132,27 @@ for (let i = 0; i <= q.count; i++) {
     q.add(() => iterator.next().value);
 }
 
+let isDone = false;
 q.onFulfilled((result) => {
+    if(isDone) {
+        return;
+    }
     console.log(result)
     if (result.valid) {
+        isDone = true;
         console.log(`Password is '${result.password}'`);
         this.tasks = [];
         this.queueSize = 0;
+        isDone = true;
         return;
     }
-    q.add(() => iterator.next().value);
+
+    const next = iterator.next();
+    if(next.done) {
+        isDone = true;
+        return;
+    }
+    q.add(() => next.value);
 });
 
 console.timeEnd();
